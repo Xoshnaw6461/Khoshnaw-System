@@ -1,0 +1,57 @@
+{
+  "name": "khoshnaw-system",
+  "version": "1.0.0",
+  "description": "Khoshnaw System - Discord Token Manager",
+  "author": "Khoshnaw",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Xoshnaw6461/khoshnaw-system.git"
+  },
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win",
+    "build:win": "electron-builder --win",
+    "package": "electron-packager . KhoshnawSystem --platform=win32 --arch=x64 --out=dist --overwrite --prune=true --icon=logo.ico"
+  },
+  "build": {
+    "appId": "com.khoshnaw.system",
+    "productName": "Khoshnaw System",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "logo.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ],
+    "files": [
+      "main.js",
+      "renderer.js",
+      "index.html",
+      "preload.js",
+      "logo.png",
+      "logo.ico"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^26.8.1",
+    "electron-packager": "^17.1.2"
+  },
+  "dependencies": {
+    "axios": "^1.15.2",
+    "electron-updater": "^6.8.3",
+    "ws": "^8.20.0"
+  }
+}

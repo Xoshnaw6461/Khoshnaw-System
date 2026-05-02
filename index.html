@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Khoshnaw System | Discord Toolkit</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+    }
+
+    body {
+      background: #0e0e12;
+      min-height: 100vh;
+      color: #e1e7f0;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1a1c24;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #5865f2;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4752c4;
+    }
+
+    /* ===== LICENSE KEY OVERLAY ===== */
+    .key-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 30% 10%, #0a0a0f, #030304);
+      backdrop-filter: blur(2px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .key-card {
+      background: #111214;
+      border-radius: 2rem;
+      padding: 2.5rem 2rem;
+      max-width: 460px;
+      width: 90%;
+      text-align: center;
+      border: 1px solid #2c2f3a;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(88, 101, 242, 0.2);
+    }
+
+    .key-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(145deg, #5865f2, #3b44b0);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+      font-size: 2.7rem;
+    }
+
+    .key-card h2 {
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #dee0fc, #a5adff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .key-card p {
+      color: #8e92a2;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .key-card input {
+      width: 100%;
+      background: #1e1f28;
+      border: 1px solid #2c2f3c;
+      border-radius: 40px;
+      padding: 14px 18px;
+      color: white;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 16px;
+      transition: all 0.2s;
+    }
+
+    .key-card input:focus {
+      outline: none;
+      border-color: #5865f2;
+      box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.3);
+    }
+
+    .key-card button {
+      background: #5865f2;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .key-card button:hover {
+      background: #4752c4;
+      transform: translateY(-1px);
+    }
+
+    .key-error {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #f86b6b;
+    }
+
+    .key-success {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #57f287;
+    }
+
+    .support-small {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+    }
+
+    .support-small a {
+      color: #57f287;
+      text-decoration: none;
+    }
+
+    /* ===== MAIN APP ===== */
+    .main-shell {
+      display: none;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.2rem 1.5rem;
+    }
+
+    /* ===== HEADER ===== */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #292b33;
+      margin-bottom: 1.8rem;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: linear-gradient(145deg, #5865f2, #3b44b0);
+      box-shadow: 0 2px 8px rgba(88, 101, 242, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .logo-badge:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(88, 101, 242, 0.6);
+    }
+
+    .logo-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .app-header h1 {
+      font-size: 1.6rem;
+      background: linear-gradient(120deg, #e1e9ff, #b0bbf5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .lang-selector {
+      background: #1e1f2a;
+      border: 1px solid #353842;
+      border-radius: 30px;
+      padding: 6px 14px;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-selector:hover {
+      background: #2c2f3a;
+    }
+
+    .logout-btn {
+      background: #2c2f3a;
+      border: none;
+      padding: 6px 18px;
+      border-radius: 32px;
+      color: #ff8a8a;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: #ed4245;
+      color: white;
+    }
+
+    /* ===== TABS ===== */
+    .tabs-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid #24262e;
+      padding-bottom: 8px;
+    }
+
+    .tab-button {
+      background: transparent;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #949baa;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-button.active {
+      background: #5865f2;
+      color: white;
+      box-shadow: 0 2px 8px rgba(88, 101, 242, 0.3);
+    }
+
+    .tab-button:hover:not(.active) {
+      background: #262933;
+      color: #e0e4f0;
+    }
+
+    .dev-tab {
+      background: linear-gradient(135deg, #f0b232, #d4941a);
+      color: #1a1a1e !important;
+    }
+
+    .dev-tab.active {
+      background: linear-gradient(135deg, #f0b232, #c48410);
+      color: #1a1a1e !important;
+    }
+
+    /* ===== PROFILE CARD (Discord Style) ===== */
+.profile-card {
+  background: #0f1117;
+  border-radius: 24px;
+  overflow: hidden;
+  margin-bottom: 1.8rem;
+  border: 1px solid #282b34;
+}
+
+.profile-banner {
+  height: 120px;
+  background: linear-gradient(135deg, #5865f2, #3b44b0);
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.profile-banner:hover {
+  opacity: 0.9;
+}
+
+.profile-banner:hover .profile-banner-edit {
+  opacity: 1;
+}
+
+.profile-banner-edit {
+  position: absolute;
+  bottom: 10px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.6);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-banner-edit:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.05);
+}
+
+.profile-avatar-section {
+  position: relative;
+  margin-top: -50px;
+  margin-left: 25px;
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid #0f1117;
+  background: #1e1e2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-avatar:hover {
+  opacity: 0.8;
+}
+
+.profile-avatar:hover .profile-avatar-edit {
+  opacity: 1;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-edit {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-avatar-edit:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.05);
+}
+
+.profile-info {
+  padding: 15px 25px 20px 25px;
+}
+
+.profile-name {
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.profile-badge {
+  background: #5865f2;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: normal;
+}
+
+.profile-username {
+  color: #aaa;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 25px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #282b34;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: bold;
+  color: #e1e7f0;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.license-key {
+  font-family: monospace;
+  font-size: 11px;
+  word-break: break-all;
+  color: #f0b232;
+}
+
+    /* ===== CARDS ===== */
+    .card {
+      background: #0f1117;
+      border-radius: 24px;
+      padding: 1.5rem;
+      border: 1px solid #282b34;
+      margin-bottom: 1.8rem;
+      transition: all 0.2s;
+    }
+
+    .card:hover {
+      border-color: #353842;
+    }
+
+    .card h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #282b34;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card h3 {
+      font-size: 0.9rem;
+      margin: 12px 0 6px;
+      color: #b5bac1;
+    }
+
+    /* ===== GRID ===== */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    /* ===== FORM ELEMENTS ===== */
+    input, select, textarea {
+      background: #181b22;
+      border: 1px solid #2d313c;
+      border-radius: 16px;
+      padding: 10px 14px;
+      color: #f0f3fa;
+      width: 100%;
+      margin: 6px 0 12px;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #5865f2;
+      box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.2);
+    }
+
+    /* ===== BUTTONS ===== */
+    button {
+      background: #2d313e;
+      border: none;
+      border-radius: 40px;
+      padding: 8px 20px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      margin: 4px 4px 0 0;
+      transition: all 0.2s;
+    }
+
+    button.primary { background: #5865f2; }
+    button.success { background: #23a55a; }
+    button.danger { background: #da373c; }
+    button.warning { background: #f0b232; color: #1a1a1e; }
+
+    button:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .flex-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin: 12px 0;
+    }
+
+    /* ===== STATUS BOX ===== */
+    .status-box {
+      background: #1a1c24;
+      padding: 12px;
+      border-radius: 18px;
+      font-size: 0.8rem;
+      color: #abafbf;
+      margin-top: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    /* ===== TOKEN ENTRY ===== */
+    .token-entry {
+      background: #1e1e2a;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      transition: all 0.2s;
+    }
+
+    .token-entry:hover {
+      background: #252836;
+    }
+
+    /* ===== BADGES ===== */
+    .badge-icon {
+      display: inline-flex;
+      background: #2b2e3a;
+      border-radius: 30px;
+      padding: 4px 10px;
+      font-size: 0.7rem;
+      margin: 2px;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    /* ===== INFO GRID ===== */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .info-item {
+      background: #1a1c24;
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .info-label {
+      font-size: 10px;
+      color: #8e9297;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    hr {
+      border-color: #262a33;
+      margin: 1rem 0;
+    }
+
+    /* ===== TABS CONTENT ===== */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active-tab {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== NOTIFICATION ===== */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      z-index: 1001;
+      font-size: 14px;
+      font-weight: bold;
+      animation: slideIn 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .notification.success { background: #1a2a1a; border-left: 4px solid #57f287; color: #57f287; }
+    .notification.error { background: #2a1a1a; border-left: 4px solid #ed4245; color: #ed4245; }
+    .notification.warning { background: #2a2a1a; border-left: 4px solid #fee75c; color: #fee75c; }
+    .notification.info { background: #1a1a2a; border-left: 4px solid #5865f2; color: #5865f2; }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* ===== QR MODAL ===== */
+    .qr-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .qr-modal-content {
+      background: #1a1a2e;
+      padding: 30px;
+      border-radius: 24px;
+      text-align: center;
+      border: 2px solid #5865f2;
+      min-width: 350px;
+    }
+
+    .qr-modal-content img {
+      margin: 20px auto;
+      border-radius: 15px;
+      background: white;
+      padding: 10px;
+    }
+
+    /* ===== EMOJI PICKER ===== */
+    .emoji-picker {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+
+    .emoji-btn {
+      background: #1e1e2a;
+      padding: 8px 15px;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 10px;
+      margin: 0;
+      transition: all 0.2s;
+    }
+
+    .emoji-btn:hover {
+      background: #5865f2;
+      transform: scale(1.05);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .grid-2col { grid-template-columns: 1fr; }
+      .main-shell { padding: 1rem; }
+      .token-entry { flex-direction: column; text-align: center; gap: 10px; }
+      .flex-group { justify-content: center; }
+      .profile-avatar-section { margin-left: 15px; }
+      .profile-avatar { width: 70px; height: 70px; }
+      .profile-name { font-size: 18px; }
+    }
+
+    .small-note {
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+
+    /* Banner upload input hidden */
+    .banner-input, .avatar-input {
+      display: none;
+    }
+
+    /* ===== SPLASH SCREEN ===== */
+    #splashScreen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 50% 40%, #1a1c24, #050506); z-index: 9999; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; transition: opacity 0.5s ease;
+    }
+    @keyframes floatSplash {
+      0% { transform: translateY(0px); filter: drop-shadow(0 10px 20px rgba(88, 101, 242, 0.4)); }
+      50% { transform: translateY(-12px); filter: drop-shadow(0 25px 30px rgba(88, 101, 242, 0.7)); }
+      100% { transform: translateY(0px); filter: drop-shadow(0 10px 20px rgba(88, 101, 242, 0.4)); }
+    }
+    @keyframes loadBar { 0% { width: 0%; } 100% { width: 100%; } }
+  </style>
+</head>
+<body>
+
+<!-- ========== SPLASH SCREEN ========== -->
+<div id="splashScreen">
+  <div style="width: 140px; height: 140px; margin-bottom: 30px; border-radius: 32px; overflow: hidden; animation: floatSplash 3s ease-in-out infinite; background: #111214; border: 1px solid rgba(88, 101, 242, 0.5);">
+    <img src="logo.png" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'">
+  </div>
+  <h1 style="background: linear-gradient(120deg, #ffffff, #a5adff); -webkit-background-clip: text; color: transparent; font-size: 2.4rem; margin-bottom: 10px; font-weight: 800; letter-spacing: 1px;">Khoshnaw System</h1>
+  <div style="color: #8e92a2; font-size: 0.95rem; margin-bottom: 45px; letter-spacing: 3px; text-transform: uppercase; font-weight: 600;">Discord Toolkit & Manager</div>
+  <div style="color: #5865f2; font-weight: 600; font-size: 0.9rem;" id="splashLoadingText">Initializing system...</div>
+  <div style="width: 280px; height: 6px; background: rgba(26, 28, 36, 0.8); border-radius: 6px; margin-top: 15px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);">
+    <div style="height: 100%; background: linear-gradient(90deg, #5865f2, #a5adff, #ffffff); width: 0%; animation: loadBar 2.5s ease forwards;"></div>
+  </div>
+</div>
+
+<!-- ========== LICENSE KEY ACTIVATION SCREEN ========== -->
+<div id="licenseOverlay" class="key-overlay">
+  <div class="key-card">
+    <div class="key-icon">🛡️</div>
+    <h2>Khoshnaw System</h2>
+    <p id="unlockMessage">Enter your username and license key</p>
+    <input type="text" id="loginUsername" placeholder="Username (English only, lowercase)">
+    <input type="text" id="licenseKeyInput" placeholder="License Key">
+    <button id="activateLicenseBtn">🔓 Unlock System</button>
+    <div id="licenseMsg" class="key-error"></div>
+    <div class="support-small">
+      <a href="https://discord.gg/AYF4H5ts8J" target="_blank" id="supportLink">📞 Need help? Join Support Server</a>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MAIN APPLICATION ========== -->
+<div id="appContainer" class="main-shell">
+  
+  <!-- ===== HEADER ===== -->
+  <div class="app-header">
+    <div class="logo-area">
+      <div class="logo-badge">
+        <img src="logo.png" alt="Logo" id="appLogo" onerror="this.style.display='none'; this.parentElement.innerHTML='🎮'">
+      </div>
+      <h1 id="appTitle">Khoshnaw System</h1>
+    </div>
+    <div class="header-actions">
+      <select id="globalLangSwitcher" class="lang-selector">
+        <option value="en">English</option>
+        <option value="ckb">کوردی</option>
+        <option value="ar">العربية</option>
+      </select>
+      <button id="globalLogout" class="logout-btn">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- ===== TABS ===== -->
+  <div class="tabs-bar" id="tabsBar">
+    <button class="tab-button active" data-tab="profile-tab">👤 Profile</button>
+    <button class="tab-button" data-tab="tokens-tab">🎫 Tokens</button>
+    <button class="tab-button" data-tab="check-tab">🔍 Check Token</button>
+    <button class="tab-button" data-tab="dm-tab">📧 DM Deleter</button>
+    <button class="tab-button" data-tab="guild-tab">🚪 Guild Leaver</button>
+    <button class="tab-button" data-tab="voice-tab">🎤 Voice</button>
+    <button class="tab-button" data-tab="react-tab">😊 React</button>
+    <button class="tab-button" id="autoChatTabBtn" data-tab="autochat-tab" style="display: none;">💬 Auto Chat (💎)</button>
+    <button class="tab-button" id="questTabBtn" data-tab="quest-tab" style="display: none;">🎯 Quests (💎)</button>
+    <button class="tab-button" data-tab="support-tab">🆘 Support</button>
+    
+    <!-- Developer Panel Tabs (Hidden by default) -->
+    <div id="developerTabs" style="display: none; width: 100%; margin-top: 10px; border-top: 1px solid #2c2f3a; padding-top: 10px;">
+      <button class="tab-button dev-tab" data-tab="dev-keys-tab">🔑 Manage Keys</button>
+      <button class="tab-button dev-tab" data-tab="dev-repair-tab">🔧 Repair Key</button>
+      <button class="tab-button dev-tab" data-tab="dev-users-tab">👥 Users</button>
+    </div>
+  </div>
+
+<!-- ========== PROFILE TAB (Discord Style) ========== -->
+<div id="profile-tab" class="tab-content active-tab">
+  <div class="profile-card">
+    <!-- Banner Section - کلیک کردنی بانەر بۆ گۆڕین -->
+    <div class="profile-banner" id="profileBanner" style="background: linear-gradient(135deg, #5865f2, #3b44b0); cursor: pointer;">
+      <div class="profile-banner-edit" id="editBannerBtn">📷</div>
+      <input type="file" id="bannerInput" class="banner-input" accept="image/*" style="display: none;">
+    </div>
+    
+    <!-- Avatar Section - کلیک کردنی وێنە بۆ گۆڕین -->
+    <div class="profile-avatar-section">
+      <div class="profile-avatar" id="profileAvatar" style="cursor: pointer;">
+        <img src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Avatar" id="avatarImg">
+      </div>
+      <div class="profile-avatar-edit" id="editAvatarBtn">📷</div>
+      <input type="file" id="avatarInput" class="avatar-input" accept="image/*" style="display: none;">
+      
+      <div style="flex: 1; min-width: 150px;">
+        <div class="profile-name">
+          <span id="profileDisplayName">Loading...</span>
+          <span class="profile-badge" id="profileBadge">User</span>
+        </div>
+        <div class="profile-username" id="profileUsernameDisplay">@loading</div>
+      </div>
+    </div>
+    
+    <!-- Profile Info -->
+    <div class="profile-info">
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-number" id="profileTokensCount">0</div>
+          <div class="stat-label">Tokens</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="profileAccountId">-</div>
+          <div class="stat-label">Account ID</div>
+        </div>
+      </div>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">🖥️ Machine ID</div>
+          <div class="info-value" id="profileMachineId">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">🔑 License Key</div>
+          <div class="info-value license-key" id="profileLicenseKey">-</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">📅 Member Since</div>
+          <div class="info-value" id="profileMemberSince">-</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- ========== TOKENS TAB ========== -->
+  <div id="tokens-tab" class="tab-content">
+    
+    <!-- Get Discord Token Card -->
+    <div class="card">
+      <h2>🔐 Get Discord Token</h2>
+      <div class="flex-group">
+        <button id="qrLoginBtn" class="success">📱 QR Code Login</button>
+        <button id="checkTokenBtn">✅ Check Token</button>
+      </div>
+      <hr>
+      <h3>📧 Email & Password Login</h3>
+      <input type="email" id="loginEmail" placeholder="Email Address">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <div id="mfaWrapper" style="display: none;">
+        <input type="text" id="mfaCode" placeholder="2FA Code (6 digits)" maxlength="6">
+        <input type="text" id="backupCode" placeholder="Backup Code">
+      </div>
+      <button id="fetchTokenBtn" class="primary">🎯 Get Token</button>
+      <div id="tokenFetchResult" class="status-box"></div>
+      
+      <hr>
+      <h3>📝 Or Paste Token Directly</h3>
+      <div class="flex-group">
+        <input type="text" id="directTokenInput" placeholder="Paste your token here..." style="flex: 1;">
+        <button id="useDirectTokenBtn" class="success">Use Token</button>
+      </div>
+    </div>
+
+    <!-- Saved Tokens Card -->
+    <div class="card">
+      <h2>💾 Saved Tokens</h2>
+      <div class="flex-group">
+        <button id="saveTokenBtn" class="success">💾 Save Current Token</button>
+        <button id="bulkImportBtn">📥 Bulk Import</button>
+        <button id="exportTokensBtn">📤 Export All</button>
+        <button id="eraseAllTokensBtn" class="danger">🗑️ Erase All</button>
+      </div>
+      
+      <div style="margin: 15px 0;">
+        <label style="color: #b5bac1; font-size: 12px;">✏️ Or enter token manually:</label>
+        <div class="flex-group">
+          <input type="text" id="manualTokenInput" placeholder="Paste or type token here..." style="flex: 1;">
+          <button id="saveManualTokenBtn" class="primary">💾 Save</button>
+        </div>
+      </div>
+      
+      <input type="text" id="tokenSearch" placeholder="🔍 Search saved tokens or usernames...">
+      
+      <div id="bulkImportArea" style="display: none; margin-top: 12px;">
+        <textarea id="bulkTokens" rows="4" placeholder="Paste tokens (one per line)"></textarea>
+        <div class="flex-group">
+          <button id="confirmBulkImport" class="success">✅ Import</button>
+          <button id="cancelBulkImport">Cancel</button>
+        </div>
+      </div>
+      
+      <div id="savedTokensListContainer" class="status-box">
+        <div style="text-align: center; padding: 20px; color: #aaa;">💾 No tokens saved yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CHECK TOKEN TAB ========== -->
+  <div id="check-tab" class="tab-content">
+    <div class="card">
+      <h2>🔎 Token Inspector & Badges</h2>
+      
+      <h3>🎫 Select Saved Token</h3>
+      <select id="checkTokenSelect">
+        <option value="">-- Select a saved token --</option>
+      </select>
+      
+      <h3>✏️ Or Paste Token Manually</h3>
+      <input type="text" id="inspectTokenInput" placeholder="Paste Discord token here...">
+      
+      <button id="inspectTokenBtn" class="primary">🔍 Check Token</button>
+      
+      <div id="inspectProfileArea" style="margin-top: 20px; display: none;">
+        <div style="text-align: center;">
+          <img id="inspectAvatar" class="profile-avatar-img" src="https://cdn.discordapp.com/embed/avatars/0.png">
+          <h3 id="inspectUsername">Username#0000</h3>
+          <div id="inspectBadges" class="badge-row"></div>
+        </div>
+        <div class="info-grid">
+          <div class="info-item"><div class="info-label">🆔 ID</div><b id="inspectUserId">-</b></div>
+          <div class="info-item"><div class="info-label">📅 Created</div><b id="inspectCreated">-</b></div>
+          <div class="info-item"><div class="info-label">📧 Email</div><b id="inspectEmail">-</b></div>
+          <div class="info-item"><div class="info-label">📱 Phone</div><b id="inspectPhone">-</b></div>
+          <div class="info-item"><div class="info-label">💎 Nitro</div><b id="inspectNitro">None</b></div>
+          <div class="info-item"><div class="info-label">🎖️ HypeSquad</div><b id="inspectHype">None</b></div>
+        </div>
+        <button id="saveCheckedTokenBtn" class="success">💾 Save This Token</button>
+      </div>
+      <div id="inspectStatusMsg" class="status-box"></div>
+    </div>
+  </div>
+
+  <!-- ========== DM DELETER TAB ========== -->
+  <div id="dm-tab" class="tab-content">
+    <div class="card">
+      <h2>📧 DM / Channel Message Deleter</h2>
+      <small id="dmWarning" style="color: #f0b232; display: block; margin-bottom: 15px;">⚠️ Warning: Delete max 100 messages every 5 minutes to avoid rate limits</small>
+      
+      <h3>🎫 Select Saved Token</h3>
+      <select id="dmTokenSelect">
+        <option value="">-- Select a saved token --</option>
+      </select>
+      
+      <h3>✏️ Or Paste Token Manually</h3>
+      <input type="text" id="dmManualToken" placeholder="Paste Discord token here...">
+      
+      <h3>📌 Channel ID</h3>
+      <input type="text" id="dmChannelId" placeholder="Enter Channel ID">
+      
+      <h3>🔢 Messages to Delete</h3>
+      <select id="dmDeleteLimit">
+        <option value="10">10 messages</option>
+        <option value="25">25 messages</option>
+        <option value="50">50 messages</option>
+        <option value="100" selected>100 messages</option>
+        <option value="200">200 messages</option>
+      </select>
+      
+      <button id="executeDeleteMessagesBtn" class="danger">🗑️ Start Deleting</button>
+      <div id="dmDeleteStatus" class="status-box">Ready to delete messages.</div>
+    </div>
+  </div>
+
+  <!-- ========== GUILD LEAVER TAB ========== -->
+  <div id="guild-tab" class="tab-content">
+    <div class="card">
+      <h2>🚪 Leave Guild / Server</h2>
+      
+      <h3>🎫 Select Saved Token</h3>
+      <select id="guildTokenSelect">
+        <option value="">-- Select a saved token --</option>
+      </select>
+      
+      <h3>✏️ Or Paste Token Manually</h3>
+      <input type="text" id="guildManualToken" placeholder="Paste Discord token here...">
+      
+      <h3>🆔 Guild ID (Server ID)</h3>
+      <input type="text" id="guildIdInput" placeholder="Enter Server ID to leave">
+      
+      <button id="leaveServerBtn" class="danger">🚪 Leave Guild</button>
+      <div id="leaveGuildStatus" class="status-box">Ready to leave...</div>
+    </div>
+  </div>
+
+  <!-- ========== VOICE TAB ========== -->
+  <div id="voice-tab" class="tab-content">
+    <div class="card">
+      <h2>🎤 Voice Channel Joiner/Leaver</h2>
+      
+      <h3>🎫 Select Saved Token</h3>
+      <select id="voiceTokenSelect">
+        <option value="">-- Select a saved token --</option>
+      </select>
+      
+      <h3>✏️ Or Paste Token Manually</h3>
+      <input type="text" id="voiceManualToken" placeholder="Paste Discord token here...">
+      
+      <div class="grid-2col">
+        <div>
+          <h3>🏰 Guild ID</h3>
+          <input type="text" id="voiceGuildIdField" placeholder="Enter Server ID">
+          <button id="loadVoiceChannelsBtn" class="primary">📡 Load Voice Channels</button>
+        </div>
+        <div>
+          <h3>🎤 Voice Channel</h3>
+          <select id="voiceChannelSelect">
+            <option value="">-- Select Voice Channel --</option>
+          </select>
+          <input type="text" id="voiceChannelIdField" placeholder="Or enter manually">
+        </div>
+      </div>
+      
+      <div class="flex-group">
+        <button id="joinVoiceBtn" class="success">🎤 Join Voice Channel</button>
+        <button id="leaveVoiceBtn" class="danger">🔇 Leave Voice Channel</button>
+      </div>
+      <div id="voiceActionStatus" class="status-box">Ready.</div>
+      
+      <hr id="premiumVoiceHr">
+      
+      <div id="premiumVoiceSection">
+        <h2 id="bulkVoiceTitle">🎤 Bulk Voice Joiner</h2>
+        <select id="bulkVoiceTokenSelect" multiple size="4" style="height: 100px;">
+          <option value="">-- Select Tokens (Ctrl+Click for multiple) --</option>
+        </select>
+        <textarea id="bulkVoiceTokens" rows="3" placeholder="OR paste multiple tokens here (one per line)"></textarea>
+        
+        <div class="grid-2col">
+          <div>
+            <h3>🏰 Guild ID</h3>
+            <input type="text" id="bulkVoiceGuildId" placeholder="Enter Server ID">
+          </div>
+          <div>
+            <h3>🎤 Voice Channel ID</h3>
+            <input type="text" id="bulkVoiceChannelId" placeholder="Enter Voice Channel ID">
+          </div>
+        </div>
+        
+        <button id="voiceJoinBulkBtn" class="success">🎤 Join All to Voice</button>
+        <div id="bulkVoiceStatus" class="status-box">Ready.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== REACT TAB ========== -->
+  <div id="react-tab" class="tab-content">
+    <div class="card">
+      <h2>😊 React to Message</h2>
+      
+      <h3>🎫 Select Saved Token</h3>
+      <select id="reactTokenSelect">
+        <option value="">-- Select a saved token --</option>
+      </select>
+      
+      <h3>✏️ Or Paste Token Manually</h3>
+      <input type="text" id="reactManualToken" placeholder="Paste Discord token here...">
+      
+      <h3>📌 Channel ID</h3>
+      <input type="text" id="reactChannelIdField" placeholder="Enter Channel ID">
+      
+      <h3>💬 Message ID</h3>
+      <input type="text" id="reactMessageIdField" placeholder="Enter Message ID">
+      
+      <h3>😊 Emoji</h3>
+      <div class="emoji-picker">
+        <button type="button" class="emoji-btn" data-emoji="👍">👍</button>
+        <button type="button" class="emoji-btn" data-emoji="❤️">❤️</button>
+        <button type="button" class="emoji-btn" data-emoji="😂">😂</button>
+        <button type="button" class="emoji-btn" data-emoji="😮">😮</button>
+        <button type="button" class="emoji-btn" data-emoji="🔥">🔥</button>
+        <button type="button" class="emoji-btn" data-emoji="🎉">🎉</button>
+        <button type="button" class="emoji-btn" data-emoji="✅">✅</button>
+        <button type="button" class="emoji-btn" data-emoji="❌">❌</button>
+      </div>
+      <input type="text" id="reactEmojiField" placeholder="Or enter custom emoji (e.g., 😎, 🎮)">
+      
+      <div class="flex-group">
+        <button id="addReactionBtn" class="success">➕ Add Reaction</button>
+        <button id="removeReactionBtn" class="danger">➖ Remove Reaction</button>
+      </div>
+      <div id="reactResultStatus" class="status-box">Ready.</div>
+      
+      <hr id="premiumReactHr">
+      
+      <div id="premiumReactSection">
+        <h2 id="bulkReactTitle">🚀 Bulk React (Premium 💎)</h2>
+        <select id="bulkReactTokenSelect" multiple size="4" style="height: 100px;">
+          <option value="">-- Select Tokens (Ctrl+Click for multiple) --</option>
+        </select>
+        <textarea id="bulkReactTokens" rows="3" placeholder="OR paste multiple tokens here (one per line)"></textarea>
+        
+        <div class="grid-2col">
+          <div>
+            <h3>⏳ Delay (Seconds)</h3>
+            <input type="number" id="bulkReactDelay" placeholder="Delay between each react" value="5" min="1">
+          </div>
+        </div>
+        
+        <div class="flex-group">
+          <button id="bulkAddReactionBtn" class="success">➕ Add Bulk Reactions</button>
+          <button id="bulkRemoveReactionBtn" class="danger">➖ Remove Bulk Reactions</button>
+        </div>
+        <div id="bulkReactResultStatus" class="status-box">Ready.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== AUTO CHAT TAB ========== -->
+  <div id="autochat-tab" class="tab-content">
+    <div class="card">
+      <h2 id="autoChatTitle">💬 Auto Chat (Premium 💎)</h2>
+      <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Automatically send random quotes to a specific channel.</p>
+      
+      <h3>🎫 Select Saved Token</h3>
+      <select id="autoChatTokenSelect">
+        <option value="">-- Select a saved token --</option>
+      </select>
+      
+      <h3>✏️ Or Paste Token Manually</h3>
+      <input type="text" id="autoChatManualToken" placeholder="Paste Discord token here...">
+      
+      <div class="grid-2col">
+        <div>
+          <h3>📌 Channel ID</h3>
+          <input type="text" id="autoChatChannelId" placeholder="Enter Channel ID">
+        </div>
+        <div>
+          <h3>⏳ Delay (Seconds)</h3>
+          <input type="number" id="autoChatDelay" placeholder="Delay between messages" value="30" min="5">
+        </div>
+      </div>
+      
+      <div class="flex-group">
+        <button id="startAutoChatBtn" class="success">▶️ Start Auto Chat</button>
+        <button id="stopAutoChatBtn" class="danger" style="display: none;">⏹️ Stop Auto Chat</button>
+      </div>
+      <div id="autoChatResultStatus" class="status-box">Ready.</div>
+    </div>
+  </div>
+
+  <!-- ========== QUESTS TAB ========== -->
+  <div id="quest-tab" class="tab-content">
+    <div class="card">
+      <h2 id="questTitle">🎯 Quest Completer (Premium 💎)</h2>
+      <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;" id="questDesc">Complete Discord quests easily by pasting a script into the Discord Desktop App.</p>
+      
+      <div style="background: #1a1c24; padding: 20px; border-radius: 12px; margin-bottom: 20px; line-height: 1.8;">
+        <h3 id="questInstTitle" style="margin-top: 0; color: #5865f2; margin-bottom: 10px;">📜 ڕێنماییەکان / Instructions:</h3>
+        <ol style="margin-left: 20px; color: #e1e7f0; font-size: 14px;">
+          <li id="questInst1">دیسکۆردی سەر کۆمپیوتەرەکەت (Discord Desktop) بکەرەوە.</li>
+          <li id="questInst2">دوگمەکانی <b>Ctrl + Shift + I</b> دابگرە بەیەکەوە بۆ کردنەوەی ئەمسپێکت.</li>
+          <li id="questInst3">بڕۆ بۆ بەشی <b>Console</b>.</li>
+          <li id="questInst4">لە خوارەوە بنووسە <code style="background: #2b2d31; padding: 2px 6px; border-radius: 4px; color: #ff73fa;">allow pasting</code> و ئینتەر (Enter) دابگرە.</li>
+          <li id="questInst5">دوگمەی کۆپیکردنی خوارەوە دابگرە و کۆدەکە لە کۆنسۆڵەکە پەیست (Paste) بکە و ئینتەر دابگرە.</li>
+        </ol>
+      </div>
+
+      <button id="copyQuestScriptBtn" class="success" style="width: 100%; padding: 12px; font-size: 16px; margin-top: 10px;">📋 Copy Script</button>
+    </div>
+  </div>
+
+  <!-- ========== SUPPORT TAB ========== -->
+  <div id="support-tab" class="tab-content">
+    <div class="card">
+      <div style="text-align: center; padding: 20px;">
+        <img src="https://cdn.discordapp.com/avatars/340849171906953216/ede5a1d82ce74c5612db506c4726a376.webp?size=1024" style="width: 100px; border-radius: 50%; border: 3px solid #57f287; margin-bottom: 15px;">
+        <h3 style="margin-bottom: 5px;">Khoshnaw / خۆشناو</h3>
+        <p style="color: #57f287; font-size: 13px; margin-bottom: 5px;">Developer & Creator</p>
+        <p style="color: #aaa; font-size: 11px; margin-bottom: 20px;">ID: 340849171906953216</p>
+        
+        <hr style="margin: 20px 0;">
+        
+        <h3 style="margin-bottom: 10px;">🚀 Join Support Server</h3>
+        <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Get help, updates and more tools!</p>
+        
+        <a href="https://discord.gg/AYF4H5ts8J" target="_blank">
+          <button style="background: linear-gradient(135deg, #5865f2, #4752c4); padding: 12px 35px; font-size: 16px; border: none; border-radius: 50px; cursor: pointer; color: white; font-weight: bold;">
+            🔗 Join Support Server
+          </button>
+        </a>
+        
+        <hr style="margin: 30px 0 20px;">
+        
+        <p style="font-size: 11px; color: #666;">Made with ⚡ by Khoshnaw </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== DEVELOPER PANEL TABS ========== -->
+
+  <!-- Manage Keys Tab -->
+  <div id="dev-keys-tab" class="tab-content">
+    <div class="card">
+      <h2>🔑 Key Management System</h2>
+      <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Generate, view and manage all license keys</p>
+              
+      <div>
+        <h3>📋 All License Keys</h3>
+        <div class="flex-group" style="margin-bottom: 15px;">
+          <input type="text" id="keySearch" placeholder="🔍 Search keys..." style="flex: 1;">
+          <button id="refreshKeysBtn" class="primary">🔄 Refresh</button>
+        </div>
+        <div id="allKeysList" class="status-box" style="max-height: 500px;">
+          <div style="text-align: center; padding: 40px;">Click refresh to load keys...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Repair Key Tab -->
+  <div id="dev-repair-tab" class="tab-content">
+    <div class="card">
+      <h2>🔧 Repair User Key</h2>
+      <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Fix or reset a user's license key</p>
+      
+      <div style="background: #1a1c24; padding: 20px; border-radius: 16px;">
+        <h3>🆔 User Information</h3>
+        <input type="text" id="repairUsername" placeholder="Username">
+        
+        <h3>🔑 New Key (Optional)</h3>
+        <input type="text" id="repairNewKey" placeholder="Leave empty to auto-generate">
+        
+        <div class="flex-group">
+          <button id="repairUserKeyBtn" class="warning">🔧 Repair Key</button>
+          <button id="resetUserKeyBtn" class="danger">🔄 Reset User Key</button>
+        </div>
+        
+        <div id="repairResult" class="status-box" style="margin-top: 15px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Tab -->
+  <div id="dev-users-tab" class="tab-content">
+    <div class="card">
+      <h2>👥 Registered Users</h2>
+      <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">View all users and their key status</p>
+      
+      <div class="flex-group" style="margin-bottom: 15px;">
+        <input type="text" id="userSearch" placeholder="🔍 Search users..." style="flex: 1;">
+        <button id="refreshUsersBtn" class="primary">🔄 Refresh</button>
+      </div>
+      
+      <div id="allUsersList" class="status-box" style="max-height: 500px;">
+        <div style="text-align: center; padding: 40px;">Click refresh to load users...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ========== QR MODAL ========== -->
+<div id="qrModal" class="qr-modal">
+  <div class="qr-modal-content">
+    <h2 id="qrTitle">🔐 Scan QR Code</h2>
+    <p id="qrDesc">Open Discord → Settings → Scan QR Code</p>
+    <img id="qrImage" src="" alt="QR Code" style="width: 250px; height: 250px;">
+    <div id="qrStatus" style="margin: 15px 0;">⏳ Waiting for scan...</div>
+    <button id="closeQrBtn" class="close-qr" style="background: #da373c;">Close</button>
+  </div>
+</div>
+
+<script src="renderer.js"></script>
+</body>
+</html>
