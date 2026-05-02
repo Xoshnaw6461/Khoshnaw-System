@@ -11,8 +11,8 @@ app.use(cors());
 app.use(express.json());
 
 // ========== MongoDB Connection ==========
-// تکایە ئەم لینکە بە لینکی خۆت دڵخۆش بکە
-const MONGODB_URI = 'mongodb+srv://username:password@cluster.mongodb.net/khoshnaw?retryWrites=true&w=majority';
+// لینکەکەی خۆت لێرە دابنێ (پاسۆردەکەی خۆت لەبری <password> بنووسە)
+const MONGODB_URI = 'mongodb+srv://khoshnaw:khoshnaw101@khoshnaw.09ne9pq.mongodb.net/?appName=khoshnaw';
 
 // Connect to MongoDB
 mongoose.connect(MONGODB_URI, {
