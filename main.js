@@ -298,6 +298,11 @@ ipcMain.handle('check-session', async () => {
   }
   
   if (session && session.isUnlocked) {
+    if (session.expiresAt && Date.now() > session.expiresAt) {
+      clearSession();
+      return { isUnlocked: false };
+    }
+
     return { 
       isUnlocked: true, 
       isDeveloper: session.isDeveloper || false, 
@@ -321,13 +326,22 @@ ipcMain.handle('check-session', async () => {
       if (keyInfo || user.isDeveloper) {
         const isPremium = keyInfo ? (keyInfo.type === 'premium' || keyInfo.type === 'special') : false;
         
+        let expiresAt = Date.now() + (3650 * 24 * 60 * 60 * 1000);
+        if (keyInfo && keyInfo.type === 'trial') {
+          const usedTime = new Date(keyInfo.usedAt).getTime();
+          expiresAt = usedTime + (30 * 60 * 1000);
+          if (Date.now() > expiresAt) {
+            return { isUnlocked: false };
+          }
+        }
+
         const recoveredSession = {
           isUnlocked: true,
           isDeveloper: user.isDeveloper || false,
           isPremium: isPremium || user.isDeveloper || false,
           username: user.username,
           machineId: machineId,
-          expiresAt: Date.now() + (3650 * 24 * 60 * 60 * 1000)
+          expiresAt: expiresAt
         };
         
         saveSession(recoveredSession);
@@ -454,6 +468,14 @@ ipcMain.handle('verify-key-only', async (event, { key, username }) => {
     return { success: false, error: '❌ Invalid license key!' };
   }
   
+  // Trial key expiration check
+  if (foundKey.type === 'trial' && foundKey.used) {
+    const usedTime = new Date(foundKey.usedAt).getTime();
+    if (Date.now() - usedTime > 30 * 60 * 1000) {
+      return { success: false, error: '❌ This trial key has expired (30 minutes limit)!' };
+    }
+  }
+
   if (foundKey.used && foundKey.machineId && foundKey.machineId !== machineId) {
     return { success: false, error: '❌ This key is permanently locked to another device!' };
   }
@@ -511,13 +533,19 @@ ipcMain.handle('verify-key-only', async (event, { key, username }) => {
     console.log('✅ Existing user updated:', cleanUsername);
   }
   
+  let expiresAt = Date.now() + (3650 * 24 * 60 * 60 * 1000); // 10 years
+  if (foundKey.type === 'trial') {
+    const usedTime = foundKey.usedAt ? new Date(foundKey.usedAt).getTime() : Date.now();
+    expiresAt = usedTime + (30 * 60 * 1000); // 30 minutes
+  }
+
   saveSession({
     isUnlocked: true,
     isDeveloper: false,
     isPremium: isPremium,
     username: cleanUsername,
     machineId: machineId,
-    expiresAt: Date.now() + (3650 * 24 * 60 * 60 * 1000)
+    expiresAt: expiresAt
   });
   
   return { success: true, isDeveloper: false, message: 'Key activated successfully!', username: cleanUsername };

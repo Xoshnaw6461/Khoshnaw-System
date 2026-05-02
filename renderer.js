@@ -888,6 +888,19 @@ document.getElementById('globalLogout').onclick = async () => {
   }
 };
 
+// Auto logout if trial expires while app is open
+setInterval(() => {
+  const localSessionStr = localStorage.getItem('app_session_backup');
+  if (localSessionStr) {
+    try {
+      const session = JSON.parse(localSessionStr);
+      if (session.expiresAt && Date.now() > session.expiresAt) {
+        document.getElementById('globalLogout').click();
+      }
+    } catch(e) {}
+  }
+}, 60000);
+
 // ========== TAB SWITCHING ==========
 document.querySelectorAll('.tab-button').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1943,7 +1956,7 @@ async function loadAllKeys() {
       
       const typeHeader = document.createElement('div');
       typeHeader.style.cssText = 'background: #2b2d31; color: #fff; padding: 12px 15px; border-radius: 8px; margin-top: 20px; margin-bottom: 15px; font-size: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; border: 1px solid #1e1f22; transition: 0.2s;';
-      const typeIcon = type === 'premium' ? '💎' : type === 'special' ? '⭐' : type === 'developer' ? '👑' : '🔑';
+      const typeIcon = type === 'premium' ? '💎' : type === 'special' ? '⭐' : type === 'developer' ? '👑' : type === 'trial' ? '⏱️' : '🔑';
       
       typeHeader.innerHTML = `
         <div><strong style="color: #5865f2;">${typeIcon} ${typeTitle} Keys</strong> <span style="color: #aaa; font-size: 12px; margin-left: 10px;">(Total: ${typeKeys.length})</span></div>
@@ -2054,6 +2067,8 @@ async function loadAllUsers() {
         roleBadge = '<span style="background: #f0b232; color: #000; padding: 2px 8px; border-radius: 20px; font-size: 10px; margin-right: 5px; font-weight: bold;">👑 Developer</span>';
       } else if (user.keyType === 'premium' || user.keyType === 'special') {
         roleBadge = '<span style="background: #ff73fa; color: #fff; padding: 2px 8px; border-radius: 20px; font-size: 10px; margin-right: 5px; font-weight: bold;">💎 Premium</span>';
+      } else if (user.keyType === 'trial') {
+        roleBadge = '<span style="background: #e67e22; color: #fff; padding: 2px 8px; border-radius: 20px; font-size: 10px; margin-right: 5px; font-weight: bold;">⏱️ Trial</span>';
       } else if (user.usedKey) {
         roleBadge = '<span style="background: #5865f2; color: #fff; padding: 2px 8px; border-radius: 20px; font-size: 10px; margin-right: 5px; font-weight: bold;">👤 Normal</span>';
       }
@@ -2110,6 +2125,23 @@ if (refreshUsersBtn) {
     loadAllUsers();
   });
 }
+
+['genNormalKeyBtn', 'genPremiumKeyBtn', 'genTrialKeyBtn'].forEach(id => {
+  const btn = document.getElementById(id);
+  if (btn) {
+    btn.addEventListener('click', async () => {
+      const typeMap = { 'genNormalKeyBtn': 'normal', 'genPremiumKeyBtn': 'premium', 'genTrialKeyBtn': 'trial' };
+      const type = typeMap[id];
+      const result = await ipcRenderer.invoke('generate-new-key', { type });
+      if (result.success) {
+        showNotification(`✅ Generated: ${result.key}`, 'success');
+        loadAllKeys();
+      } else {
+        showNotification(`❌ Error: ${result.error}`, 'error');
+      }
+    });
+  }
+});
 
 // Search inputs
 const keySearch = document.getElementById('keySearch');

@@ -50,6 +50,11 @@ function generatePremiumKey() {
   return `KHOSHNAW-PREMIUM-${randomPart}`;
 }
 
+function generateTrialKey() {
+  const randomPart = crypto.randomBytes(4).toString('hex').toUpperCase();
+  return `KHOSHNAW-TRIAL-${randomPart}`;
+}
+
 function question(query) {
   return new Promise(resolve => rl.question(query, resolve));
 }
@@ -85,11 +90,12 @@ async function main() {
   console.log('1. Generate Normal Keys');
   console.log('2. Generate Special Key');
   console.log('3. Generate Premium Keys (💎)');
-  console.log('4. Show All Keys');
-  console.log('5. Exit');
+  console.log('4. Generate Trial Keys (30 mins ⏱️)');
+  console.log('5. Show All Keys');
+  console.log('6. Exit');
   console.log('\n=========================================\n');
   
-  const choice = await question('👉 Enter your choice (1-5): ');
+  const choice = await question('👉 Enter your choice (1-6): ');
   
   if (choice === '1') {
     const amount = await question('📝 How many keys to generate? (default: 10, max: 100): ');
@@ -192,6 +198,35 @@ async function main() {
     console.log(`💎 ${count} Premium Keys Generated & Saved!`);
     console.log('=========================================\n');
   } else if (choice === '4') {
+    const amount = await question('📝 How many TRIAL keys to generate? (default: 10, max: 100): ');
+    let count = Math.min(parseInt(amount) || 10, 100);
+    
+    const db = loadKeysData();
+    const keys = [];
+    
+    console.log('\n🔄 Generating trial keys...\n');
+    
+    for (let i = 0; i < count; i++) {
+      const key = generateTrialKey();
+      keys.push(key);
+      db.allKeys.push({
+        key: key,
+        type: 'trial',
+        createdAt: new Date().toISOString(),
+        used: false,
+        usedBy: null,
+        usedAt: null,
+        machineId: null
+      });
+      console.log(`   ⏱️ ${i+1}. ${key}`);
+    }
+    
+    saveKeysData(db);
+    
+    console.log('\n=========================================');
+    console.log(`⏱️ ${count} Trial Keys Generated & Saved!`);
+    console.log('=========================================\n');
+  } else if (choice === '5') {
     showAllKeys();
   } else {
     console.log('\n👋 Goodbye!');
